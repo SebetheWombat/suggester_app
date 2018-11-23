@@ -1,4 +1,5 @@
 var mongoose = require('mongoose'),
+	url = require('url'),
 	Book = mongoose.model('Books');
 
 exports.book_list = function(req,res) {
@@ -57,6 +58,18 @@ exports.view_random_book = function(req, res) {
 			}
 			res.json(book);
 		});
-	});		
+	});	
 };
+
+exports.search = function(req,res) {
+	var queryStatus = url.parse(req.url, true);
+	queryStatus = queryStatus.query;
+	console.log(queryStatus);
+	Book.find(queryStatus, function(err, book){
+		if(err){
+			res.send(err);
+		}
+		res.json(book);
+	});
+};	
 
