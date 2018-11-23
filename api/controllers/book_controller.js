@@ -1,5 +1,4 @@
 var mongoose = require('mongoose'),
-	url = require('url'),
 	Book = mongoose.model('Books');
 
 exports.book_list = function(req,res) {
@@ -62,14 +61,16 @@ exports.view_random_book = function(req, res) {
 };
 
 exports.search = function(req,res) {
-	var queryStatus = url.parse(req.url, true);
-	queryStatus = queryStatus.query;
-	console.log(queryStatus);
-	Book.find(queryStatus, function(err, book){
+	//TODO: handle posts where below nodes are missing
+	//TODO: make case insensitive
+	
+	var searchStatus = req.body['status'];
+	var searchTags = req.body['tags'];
+	
+	Book.find({status: searchStatus, tags: { $in: searchTags }}, function(err, book){
 		if(err){
 			res.send(err);
 		}
 		res.json(book);
 	});
 };	
-

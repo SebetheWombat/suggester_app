@@ -9,8 +9,8 @@ module.exports = function(app){
 	app.route('/books/random')
 		.get(bookController.view_random_book);
 
-	app.route('/test')
-		.get(bookController.search);
+	app.route('/search')
+		.post(bookController.search);
 
 	app.route('/books/:bookId')
 		.get(bookController.view_book_details)
