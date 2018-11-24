@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-
 var Schema = mongoose.Schema;
 
 var BookSchema = new Schema({
@@ -13,11 +12,13 @@ var BookSchema = new Schema({
 	},
 	status: {
 		type: String,
-		enum: ['Read', 'Unread'],
-		default: ['Unread']
+		lowercase: true,
+		enum: ['read', 'unread'],
+		default: ['unread']
 	},
 	tags: [{
-		type: String
+		type: String,
+		lowercase: true
 	}],
 	summary: {
 		type: String

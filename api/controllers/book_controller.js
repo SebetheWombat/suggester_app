@@ -61,17 +61,21 @@ exports.view_random_book = function(req, res) {
 };
 
 exports.search = function(req,res) {
-	//TODO: make case insensitive
 	
 	//If nodes are missing or empty act as though no filter were added by searching all patterns
+	//tags and status are stored as lowercase. Convert input to lowercase for accurate search
 	var searchStatus = req.body['status'];
 	if(searchStatus === undefined || searchStatus === ""){
 		searchStatus = /./;
+	}else{
+		searchStatus = searchStatus.toLowerCase();
 	}
 
 	var searchTags = req.body['tags'];
 	if(searchTags === undefined || searchTags.constructor.name !== "Array" || searchTags.length === 0){
 		searchTags = [/./];
+	}else{
+		searchTags = searchTags.map(s => {return s.toLowerCase()});
 	}
 
 	//TODO: research $in vs $elemMatch
