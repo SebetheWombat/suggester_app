@@ -48,10 +48,16 @@ exports.delete_a_book = function(req, res) {
 };
 
 exports.view_random_book = function(req, res) {
-	Book.count().exec(function(err,count){
-		var rand = Math.floor(Math.random()*count);
+	var searchStatus = parseStatus(req.body);
+	var searchTags = parseTags(req.body);
 
-		Book.findOne().skip(rand).exec(function(err,book){
+	Book.count({status: searchStatus, tags: { $in: searchTags }}, function(err,count){
+		// console.log(count);
+		var rand = Math.floor(Math.random()*count);
+		// console.log("random: " + rand);
+
+		//Uses cursor.skip() method to start search at different secionts in db based on random value
+		Book.findOne({status: searchStatus, tags: { $in: searchTags }}).skip(rand).exec(function(err,book){
 			if(err){
 				res.send(err);
 			}
@@ -61,22 +67,10 @@ exports.view_random_book = function(req, res) {
 };
 
 exports.search = function(req,res) {
-	
 	//If nodes are missing or empty act as though no filter were added by searching all patterns
 	//tags and status are stored as lowercase. Convert input to lowercase for accurate search
-	var searchStatus = req.body['status'];
-	if(searchStatus === undefined || searchStatus === ""){
-		searchStatus = /./;
-	}else{
-		searchStatus = searchStatus.toLowerCase();
-	}
-
-	var searchTags = req.body['tags'];
-	if(searchTags === undefined || searchTags.constructor.name !== "Array" || searchTags.length === 0){
-		searchTags = [/./];
-	}else{
-		searchTags = searchTags.map(s => {return s.toLowerCase()});
-	}
+	var searchStatus = parseStatus(req.body);
+	var searchTags = parseTags(req.body);
 
 	//TODO: research $in vs $elemMatch
 	Book.find({status: searchStatus, tags: { $in: searchTags }}, function(err, book){
@@ -86,3 +80,24 @@ exports.search = function(req,res) {
 		res.json(book);
 	});
 };	
+
+//Should these helpers be in different document?
+var parseStatus = function(obj){
+	var searchStatus = obj['status'];
+	if(searchStatus === undefined || searchStatus === ""){
+		searchStatus = /./;
+	}else{
+		searchStatus = searchStatus.toLowerCase();
+	}
+	return searchStatus;
+}
+
+var parseTags = function(obj){
+	var searchTags = obj['tags'];
+	if(searchTags === undefined || searchTags.constructor.name !== "Array" || searchTags.length === 0){
+		searchTags = [/./];
+	}else{
+		searchTags = searchTags.map(s => {return s.toLowerCase()});
+	}
+	return searchTags;
+}

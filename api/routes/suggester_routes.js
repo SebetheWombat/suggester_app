@@ -7,7 +7,7 @@ module.exports = function(app){
 
 	//this route must come first or 'random' will be used as :bookId and throw error
 	app.route('/books/random')
-		.get(bookController.view_random_book);
+		.post(bookController.view_random_book);
 
 	app.route('/search')
 		.post(bookController.search);
