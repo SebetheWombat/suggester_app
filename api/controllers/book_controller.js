@@ -61,12 +61,20 @@ exports.view_random_book = function(req, res) {
 };
 
 exports.search = function(req,res) {
-	//TODO: handle posts where below nodes are missing
 	//TODO: make case insensitive
 	
+	//If nodes are missing or empty act as though no filter were added by searching all patterns
 	var searchStatus = req.body['status'];
+	if(searchStatus === undefined || searchStatus === ""){
+		searchStatus = /./;
+	}
+
 	var searchTags = req.body['tags'];
-	
+	if(searchTags === undefined || searchTags.constructor.name !== "Array" || searchTags.length === 0){
+		searchTags = [/./];
+	}
+
+	//TODO: research $in vs $elemMatch
 	Book.find({status: searchStatus, tags: { $in: searchTags }}, function(err, book){
 		if(err){
 			res.send(err);
